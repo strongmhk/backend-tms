@@ -141,7 +141,7 @@ dependencies {
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
 
     // Liquibase
-    implementation 'org.liquibase:liquibase-core'
+//    implementation 'org.liquibase:liquibase-core'
 
     // Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -153,7 +153,7 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.redisson:redisson-spring-boot-starter:3.18.0'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.1'
 
     // S3 client
     implementation platform('software.amazon.awssdk:bom:2.23.7')
@@ -165,6 +165,10 @@ dependencies {
     
     // Jsoup
     implementation("org.jsoup:jsoup:1.18.2")
+
+    // monitoring
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
