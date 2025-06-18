@@ -24,6 +24,7 @@ import com.wrkr.tickety.global.annotation.architecture.UseCase;
 import com.wrkr.tickety.global.exception.ApplicationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -40,30 +41,25 @@ public class TicketCreateUseCase {
     private final MemberGetService UserGetService;
     private final TicketHistorySaveService ticketHistorySaveService;
     private final TicketGetService ticketGetService;
-    private final RedissonClient redissonClient;
+    private final Optional<RedissonClient> redissonClient;
 
     public TicketPkResponse createTicket(TicketCreateRequest request, Long userId) {
         Category childCategory = categoryGetService.getChildrenCategory(decrypt(request.categoryId()));
         Member member = UserGetService.byMemberId(userId);
 
         String lockKey = "LOCK:ticket:" + childCategory.getCategoryId();
-        RLock lock = redissonClient.getLock(lockKey);
+
+        if (redissonClient.isEmpty()) {
+            // Redis가 없을 경우 락 없이 처리 (주의: 병행성 이슈 있음)
+            return createWithoutLock(request, childCategory, member);
+        }
+
+        RLock lock = redissonClient.get().getLock(lockKey);
 
         try {
             if (lock.tryLock(5, 10, TimeUnit.SECONDS)) {
                 try {
-                    String serialNumber = generateSerialNumber(childCategory);
-                    TicketStatus status = TicketStatus.REQUEST;
-
-                    Ticket ticket = mapToTicket(request, childCategory, serialNumber, status, member);
-                    Ticket savedTicket = ticketSaveService.save(ticket);
-
-                    ModifiedType modifiedType = ModifiedType.STATUS;
-                    TicketHistory ticketHistory = TicketHistoryMapper.mapToTicketHistory(savedTicket,
-                        modifiedType);
-                    ticketHistorySaveService.save(ticketHistory);
-
-                    return toTicketPkResponse(encrypt(savedTicket.getTicketId()));
+                    return createInternal(request, childCategory, member);
 
                 } finally {
                     lock.unlock();
@@ -83,5 +79,24 @@ public class TicketCreateUseCase {
             String.format("%02d", Integer.parseInt(ticketGetService.findLastSequence(today, childCategory)) + 1);
 
         return "#" + prefix + sequence;
+    }
+
+    private TicketPkResponse createWithoutLock(TicketCreateRequest request, Category childCategory, Member member) {
+        // 락 없이 내부 로직 실행
+        return createInternal(request, childCategory, member);
+    }
+
+    private TicketPkResponse createInternal(TicketCreateRequest request, Category childCategory, Member member) {
+        String serialNumber = generateSerialNumber(childCategory);
+        TicketStatus status = TicketStatus.REQUEST;
+
+        Ticket ticket = mapToTicket(request, childCategory, serialNumber, status, member);
+        Ticket savedTicket = ticketSaveService.save(ticket);
+
+        ModifiedType modifiedType = ModifiedType.STATUS;
+        TicketHistory ticketHistory = TicketHistoryMapper.mapToTicketHistory(savedTicket, modifiedType);
+        ticketHistorySaveService.save(ticketHistory);
+
+        return toTicketPkResponse(encrypt(savedTicket.getTicketId()));
     }
 }

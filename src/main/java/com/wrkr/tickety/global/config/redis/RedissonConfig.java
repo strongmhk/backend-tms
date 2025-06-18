@@ -12,20 +12,20 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "spring.redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedissonConfig {
 
-    @Value("${spring.data.redis.host}")
+/*    @Value("${spring.data.redis.host}")
     private String host;
 
     @Value("${spring.data.redis.port}")
     private int port;
 
     @Value("${spring.data.redis.password}")
-    private String password;
+    private String password;*/
 
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        String redisAddress = "redis://" + host + ":" + port;
-        config.useSingleServer().setAddress(redisAddress).setPassword(password);
+/*        String redisAddress = "redis://" + host + ":" + port;
+        config.useSingleServer().setAddress(redisAddress).setPassword(password);*/
         config.setCodec(new StringCodec());
         return org.redisson.Redisson.create(config);
     }

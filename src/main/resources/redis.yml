@@ -1,3 +1,14 @@
+---
+spring.config.activate.on-profile: local
+
+spring:
+  redis:
+    enabled: false
+
+
+---
+spring.config.activate.on-profile: dev
+
 spring:
   data:
     redis:
