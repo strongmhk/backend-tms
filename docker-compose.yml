@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db
+    environment:
+      MYSQL_DATABASE: tickety_local
+      MYSQL_USER: tickety
+      MYSQL_PASSWORD: tickety1!
+      MYSQL_ROOT_PASSWORD: tickety1!
+    ports:
+      - "3366:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - monitoring
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "tickety", "--password=tickety1!" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s  # 컨테이너 시작 후 30초 동안은 실패를 무시
+    deploy:
+      resources:
+        limits:
+          cpus: "2"  # 최대 2개의 코어 할당
+          memory: 2GB   # 최대 2GB 메모리 할당
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  k6:
+    image: grafana/k6:latest
+    ports:
+      - "6565:6565"
+    volumes:
+      - ./script.js:/script.js
+    networks:
+      - monitoring
+    command: run /script.js
+
+  redis:
+    image: redis:7.0
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--requirepass", "tickety1!" ]
+    volumes:
+      - redis_data:/data
+    networks:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+  # Redis Exporter
+  redis_exporter:
+    image: oliver006/redis_exporter
+    container_name: redis_exporter
+    ports:
+      - "9121:9121"
+    command:
+      - '--redis.addr=redis://redis:6379'
+      - '--redis.password=tickety1!'
+    depends_on:
+      - redis
+    networks:
+      - monitoring
+
+volumes:
+  mysql_data:
+  grafana_data:
+  redis_data:
+
+networks:
+  monitoring:

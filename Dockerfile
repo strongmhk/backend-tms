@@ -2,7 +2,7 @@ FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 
-ENV SPRING_PROFILES_ACTIVE=prod
+#ENV SPRING_PROFILES_ACTIVE=prod
 
 COPY build/libs/*.jar app.jar
 
