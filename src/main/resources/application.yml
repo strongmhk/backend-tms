@@ -8,13 +8,14 @@ spring:
       - mysql.yml
       - swagger.yml
       - crypto.yml
-      - liquibase.yml
+#      - liquibase.yml
       - mail.yml
       - redis.yml
       - jwt.yml
       - s3.yml
       - kakaowork.yml
       - thread.yml
+      - monitoring.yml
   data:
     web:
       pageable:
