@@ -31,22 +31,22 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/${DATABASE_NAME:tickety_local}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true
-    username: ${DATABASE_USERNAME:root}
-    password: ${DATABASE_PASSWORD:root}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
 
 logging:
   level:
     ROOT: INFO
-    org.hibernate: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.sql: debug
-    org.hibernate.type: trace
-    com.zaxxer.hikari.HikariConfig: DEBUG
-    org.springframework.orm: TRACE
-    org.springframework.transaction: TRACE
-    com.zaxxer.hikari: TRACE
-    com.mysql.cj.jdbc: TRACE
+#    org.hibernate: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    org.hibernate.sql: debug
+#    org.hibernate.type: trace
+#    com.zaxxer.hikari.HikariConfig: DEBUG
+#    org.springframework.orm: TRACE
+#    org.springframework.transaction: TRACE
+#    com.zaxxer.hikari: TRACE
+#    com.mysql.cj.jdbc: TRACE
 
 ---
 spring.config.activate.on-profile: dev
