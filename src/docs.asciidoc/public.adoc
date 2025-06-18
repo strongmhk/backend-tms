@@ -75,10 +75,10 @@ include::{snippets}/Public/regeneratePassword/Failure/InvalidVerificationCode/re
 
 HTTP Request
 
-include::{snippets}/Public/regeneratePassword/Failure/MemberNotFound/http-request.adoc[]
-include::{snippets}/Public/regeneratePassword/Failure/MemberNotFound/request-fields.adoc[]
+include::{snippets}/Public/regeneratePassword/Failure/NotExistMember/http-request.adoc[]
+include::{snippets}/Public/regeneratePassword/Failure/NotExistMember/request-fields.adoc[]
 
 HTTP Response
 
-include::{snippets}/Public/regeneratePassword/Failure/MemberNotFound/http-response.adoc[]
-include::{snippets}/Public/regeneratePassword/Failure/MemberNotFound/response-fields.adoc[]
+include::{snippets}/Public/regeneratePassword/Failure/NotExistMember/http-response.adoc[]
+include::{snippets}/Public/regeneratePassword/Failure/NotExistMember/response-fields.adoc[]
