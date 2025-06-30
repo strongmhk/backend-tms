@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,13 +39,4 @@ public class EmailNotificationEntity extends BaseTimeEntity {
     private EmailNotiStatus status;
 
     private int retryCount;
-
-    public void markSent() {
-        this.status = EmailNotiStatus.SENT;
-    }
-
-    public void markFailed() {
-        this.status = EmailNotiStatus.FAILED;
-        this.retryCount += 1;
-    }
 }
