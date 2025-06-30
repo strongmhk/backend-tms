@@ -14,10 +14,14 @@ import static com.wrkr.tickety.domains.member.exception.MemberErrorCode.INVALID_
 import static com.wrkr.tickety.domains.member.exception.MemberErrorCode.INVALID_ROLE;
 
 import com.wrkr.tickety.domains.auth.exception.AuthErrorCode;
+import com.wrkr.tickety.domains.member.application.dto.request.MemberCreateRequestForExcel;
 import com.wrkr.tickety.domains.member.domain.constant.Role;
 import com.wrkr.tickety.domains.member.domain.service.MemberGetService;
 import com.wrkr.tickety.global.exception.ApplicationException;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -45,10 +49,39 @@ public class MemberFieldValidator {
         validatePosition(position);
         validatePhoneFormat(phone);
         validateRole(role);
-        validateNicknameFormat(nickname);
+//        validateNicknameFormat(nickname);
         validateNicknameDuplicate(nickname);
-        validateEmailFormat(email);
+//        validateEmailFormat(email);
         validateEmailDuplicate(email);
+    }
+
+    public void validateBulk(List<MemberCreateRequestForExcel> requests) {
+        // 전체 데이터를 한꺼번에 검사
+        Set<String> emails = requests.stream().map(MemberCreateRequestForExcel::getEmail).collect(Collectors.toSet());
+        Set<String> nicknames = requests.stream().map(MemberCreateRequestForExcel::getNickname).collect(Collectors.toSet());
+
+        // 이메일 중복 체크
+        List<String> existingEmails = memberGetService.findExistingEmails(emails);
+        if (!existingEmails.isEmpty()) {
+            throw ApplicationException.from(ALREADY_EXIST_EMAIL);
+        }
+
+        // 닉네임 중복 체크
+        List<String> existingNicknames = memberGetService.findExistingNicknames(nicknames);
+        if (!existingNicknames.isEmpty()) {
+            throw ApplicationException.from(ALREADY_EXIST_NICKNAME);
+        }
+
+        // 개별 형식 검사
+        for (MemberCreateRequestForExcel request : requests) {
+//            validateNicknameFormat(request.getNickname());
+//            validateEmailFormat(request.getEmail());
+            validateName(request.getName());
+            validateDepartment(request.getDepartment());
+            validatePosition(request.getPosition());
+            validatePhoneFormat(request.getPhone());
+            validateRole(request.getRole());
+        }
     }
 
     public void validateEmailFormat(String email) {
