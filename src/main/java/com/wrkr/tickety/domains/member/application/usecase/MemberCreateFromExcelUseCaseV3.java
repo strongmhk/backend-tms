@@ -16,10 +16,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 
+// 이메일 전송 후보정 처리 적용
 @UseCase
 @RequiredArgsConstructor
 @Slf4j
-public class MemberCreateFromExcelUseCaseWithBulk {
+public class MemberCreateFromExcelUseCaseV3 {
 
     private final MemberSaveService memberSaveService;
     private final MemberFieldValidator memberFieldValidator;
