@@ -5,10 +5,12 @@ import com.wrkr.tickety.domains.member.domain.constant.Role;
 import com.wrkr.tickety.domains.member.domain.model.Member;
 import com.wrkr.tickety.domains.member.exception.MemberErrorCode;
 import com.wrkr.tickety.domains.member.persistence.adapter.MemberPersistenceAdapter;
+import com.wrkr.tickety.domains.member.persistence.repository.MemberRepository;
 import com.wrkr.tickety.global.common.dto.ApplicationPageRequest;
 import com.wrkr.tickety.global.exception.ApplicationException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberGetService {
 
     private final MemberPersistenceAdapter memberPersistenceAdapter;
+    private final MemberRepository memberRepository;
 
     public Member byMemberId(Long memberId) {
         return memberPersistenceAdapter.findById(memberId)
@@ -70,5 +73,17 @@ public class MemberGetService {
 
     public List<Member> getAllManagers() {
         return memberPersistenceAdapter.getAllManagers();
+    }
+
+    public List<String> findExistingEmails(Set<String> emails) {
+        return memberRepository.findExistingEmails(emails);
+    }
+
+    public List<String> findExistingNicknames(Set<String> nicknames) {
+        return memberRepository.findExistingNicknames(nicknames);
+    }
+
+    public Long findMemberIdByEmail(String email) {
+        return memberRepository.findIdByEmail(email);
     }
 }

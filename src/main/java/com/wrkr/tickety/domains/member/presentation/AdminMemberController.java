@@ -27,7 +27,9 @@ import com.wrkr.tickety.domains.member.application.dto.response.MemberInfoPrevie
 import com.wrkr.tickety.domains.member.application.dto.response.MemberInfoResponse;
 import com.wrkr.tickety.domains.member.application.dto.response.MemberPkResponse;
 import com.wrkr.tickety.domains.member.application.usecase.ExcelExampleCreateUseCase;
-import com.wrkr.tickety.domains.member.application.usecase.MemberCreateFromExcelUseCase;
+import com.wrkr.tickety.domains.member.application.usecase.MemberCreateFromExcelUseCaseV1;
+import com.wrkr.tickety.domains.member.application.usecase.MemberCreateFromExcelUseCaseV2;
+import com.wrkr.tickety.domains.member.application.usecase.MemberCreateFromExcelUseCaseV3;
 import com.wrkr.tickety.domains.member.application.usecase.MemberCreateUseCase;
 import com.wrkr.tickety.domains.member.application.usecase.MemberInfoGetUseCase;
 import com.wrkr.tickety.domains.member.application.usecase.MemberInfoSearchUseCase;
@@ -68,7 +70,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 public class AdminMemberController {
 
-    private final MemberCreateFromExcelUseCase memberCreateFromExcelUseCase;
+    private final MemberCreateFromExcelUseCaseV3 memberCreateFromExcelUseCaseV3;
     private final MemberCreateUseCase memberCreateUseCase;
     private final MemberInfoUpdateUseCase memberInfoUpdateUseCase;
     private final MemberInfoGetUseCase memberInfoGetUseCase;
@@ -121,15 +123,15 @@ public class AdminMemberController {
     )
     @Operation(summary = "관리자 - 회원 등록(엑셀 파일 업로드)", description = "정해진 양식의 엑셀 파일 내용을 읽어 회원을 등록합니다.")
     @PostMapping(value = "/excel", consumes = MULTIPART_FORM_DATA_VALUE)
-    public ApplicationResponse<List<MemberPkResponse>> createMemberExcelUpload(
+    public ApplicationResponse<Void> createMemberExcelUpload(
         @AuthenticationPrincipal Member member,
         @Parameter(description = "엑셀 파일")
         @RequestParam(required = false) MultipartFile file
     ) {
         List<MemberCreateRequestForExcel> memberCreateRequestForExcels = excelUtil.parseExcelToObject(file, MemberCreateRequestForExcel.class);
-        List<MemberPkResponse> memberPkResponses = memberCreateFromExcelUseCase.createMember(memberCreateRequestForExcels);
+        memberCreateFromExcelUseCaseV3.createMembersWithEmailNotification(memberCreateRequestForExcels);
 
-        return ApplicationResponse.onSuccess(memberPkResponses);
+        return ApplicationResponse.onSuccess();
     }
 
     @Operation(summary = "관리자 - 회원 등록 엑셀 양식 다운로드", description = "회원 등록에 필요한 정해진 양식의 엑셀 파일을 다운로드합니다.")
